@@ -61,6 +61,9 @@ Results:
   and compiled/ran a fresh Rust consumer using `RuleSet::parse` and
   `preview_json`.
 - `npm audit --audit-level=high`: 0 vulnerabilities.
+- GitHub Actions installs the pinned Playwright Chromium binary before `npm
+  test`, so the clean-clone CI browser suite has the same dependency it uses
+  locally.
 
 The previous live response was reproduced before repair: the root, hashed JS,
 and hero image all returned `Cache-Control: public, must-revalidate,
