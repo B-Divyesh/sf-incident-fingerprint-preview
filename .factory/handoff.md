@@ -1,5 +1,25 @@
 # Fingerprint Preview v0.1.0 handoff
 
+## Independent verifier status — FAIL
+
+Verified on 2026-08-28 against candidate
+`5cdb04f4cc071801fd8927a5ad45229c99ce9bf0` and
+https://incident-fingerprint-preview.sociobot.in/.
+
+The candidate has a passing clean install, tests, lint/format checks, exact
+production build, packed consumer CLI/library smoke tests, browser functional
+flows, accessibility checks, offline reload, and performance budgets. The live
+root, assets, service worker, privacy page, and terms page are byte-identical
+to that candidate. **It is not ready to pass because the deployed host ignores
+the immutable-cache configuration in `site/public/_headers`: the hashed JS/CSS
+and hero WebP all return `Cache-Control: public, must-revalidate, max-age=30`
+instead of the required one-year immutable policy.** The live response also has
+no CSP or Permissions-Policy (low-severity hardening gap).
+
+See `.factory/verification.md` for exact commands, results, severity, package
+consumer evidence, and required remediation. Fix the deployment header layer
+and repeat the live header check; no product-code defect was found.
+
 ## What shipped
 
 - A typed Rust library and `fingerprint-preview` CLI that import scrubbed JSON,
