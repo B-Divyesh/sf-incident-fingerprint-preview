@@ -1,0 +1,11 @@
+{
+  "slug": "incident-fingerprint-preview",
+  "title": "Fingerprint Preview",
+  "territory": "devtools-data",
+  "user": "Engineers tuning error grouping rules who need to see exactly how a proposed fingerprint would split or merge real incident samples before changing alert volume in production.",
+  "smallest_useful_product": "A CLI/library that imports redacted event JSON, evaluates a small fingerprint-rule DSL, and reports split/merge deltas with representative frames.",
+  "success_measure": "In a labeled sample, users improve correct grouping precision by 20 percentage points without increasing the number of groups more than 10%.",
+  "artifact_class": "cli",
+  "monetization": "free",
+  "constraints": "Input must be locally scrubbed; offer vendor-specific parsers but no claim of exact proprietary grouping semantics; preserve stack privacy."
+}
