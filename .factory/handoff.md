@@ -1,47 +1,96 @@
-# Fingerprint Preview v0.1.0 handoff
+# Fingerprint Preview v0.1.0 repair handoff
 
-## Independent verifier status — FAIL
+## Repair status
 
-Verified on 2026-08-28 against candidate
-`5cdb04f4cc071801fd8927a5ad45229c99ce9bf0` and
-https://incident-fingerprint-preview.sociobot.in/.
+Repaired the release-blocking finding from independent verification commit
+`b342b93e7716bdab53de2e2c9b5da1867f22643a` against candidate
+`5cdb04f4cc071801fd8927a5ad45229c99ce9bf0`.
 
-The candidate has a passing clean install, tests, lint/format checks, exact
-production build, packed consumer CLI/library smoke tests, browser functional
-flows, accessibility checks, offline reload, and performance budgets. The live
-root, assets, service worker, privacy page, and terms page are byte-identical
-to that candidate. **It is not ready to pass because the deployed host ignores
-the immutable-cache configuration in `site/public/_headers`: the hashed JS/CSS
-and hero WebP all return `Cache-Control: public, must-revalidate, max-age=30`
-instead of the required one-year immutable policy.** The live response also has
-no CSP or Permissions-Policy (low-severity hardening gap).
+Root cause: the static deployment is Azure Static Web Apps, which does not
+consume the Cloudflare/Netlify-style `site/public/_headers` file. Consequently
+the live host applied its 30-second default cache policy to hash-named JS, CSS,
+and the immutable hero image.
 
-See `.factory/verification.md` for exact commands, results, severity, package
-consumer evidence, and required remediation. Fix the deployment header layer
-and repeat the live header check; no product-code defect was found.
+Repair:
 
-## What shipped
+- Added `site/public/staticwebapp.config.json`, copied to the root of
+  `dist/site/`, with Azure Static Web Apps route policies: `/assets/*` and
+  `/instrument-bench.webp` receive `Cache-Control: public, max-age=31536000,
+  immutable`; HTML and `sw.js` revalidate.
+- Added a restrictive same-origin Content-Security-Policy and a minimal
+  Permissions-Policy at the Azure deployment layer, resolving the verifier's
+  low-severity hardening gap too.
+- Kept the same security policy in `_headers` for any compatible static-host
+  preview; this does not alter application code or product behaviour.
+- Added exact regression coverage that checks every cache/security directive
+  and confirms Vite copies the Azure configuration into the production output.
 
-- A typed Rust library and `fingerprint-preview` CLI that import scrubbed JSON,
-  parse the five-part fingerprint DSL with ordered fallbacks, calculate stable
-  proposed group IDs, and report baseline splits, cross-group merges, stable
-  groups, event membership, and privacy-reduced representative frames.
-- Automatic plus explicit generic, Sentry, Bugsnag, and Rollbar adapters. The
-  adapter boundary is stated honestly in the CLI, README, and site: this is not
-  a reproduction of proprietary vendor grouping semantics.
-- Human terminal output, versioned `--json` output, useful `--help`, documented
-  exit codes, sample fixtures, library docs, unit/integration/doctests, and CI.
-- A static Vite documentation site with a browser-local evaluator matching the
-  CLI's rule and group-ID behavior, file/paste input, sample restore, error and
-  empty states, Ctrl/Command+Enter, JSON export, offline status, service-worker
-  shell caching, privacy and terms pages, and no tracking or persistence.
-- A product-specific mid-century instrument-panel system and original generated
-  bench illustration. The final WebP is 960×640 and 47,380 bytes; exact prompt
-  and generation metadata are in `.factory/assets/instrument-bench.json`.
+## Verification evidence
 
-## Build and verification
+Run from a clean dependency install on 2026-08-28:
 
-Clean-clone setup and exact factory build:
+```sh
+npm ci
+cargo fmt --check
+cargo clippy --all-targets --all-features -- -D warnings
+npm test
+npm run build
+cargo test --doc
+cargo package --allow-dirty
+npm audit --audit-level=high
+```
+
+Results:
+
+- `npm ci`: 22 packages audited, 0 vulnerabilities.
+- `cargo fmt --check` and strict `cargo clippy`: pass.
+- `npm test`: 7 Rust library tests, 2 CLI integration tests, 1 doctest,
+  7 site/configuration tests, and 11 Playwright checks pass; 1 intentionally
+  non-mobile keyboard test is skipped. Playwright covers Chromium desktop and
+  390×844 mobile, keyboard evaluation, export, error recovery, no horizontal
+  overflow, legal routes, and axe WCAG 2 A/AA (no serious/critical violations).
+- Production output test passes and verifies
+  `dist/site/staticwebapp.config.json` exactly matches the source response
+  policy. Built JS is 11.13 KB raw / 4.27 KB gzip and CSS is 17.00 KB raw /
+  4.66 KB gzip; the original 47.38 KB WebP asset remains below budget.
+- `cargo test --doc` and `cargo package --allow-dirty` pass (17 packaged
+  files, 83.4 KiB unpacked / 23.6 KiB compressed).
+- Packed consumer verification: installed the package from
+  `target/package/incident-fingerprint-preview-0.1.0`, ran `--help`, evaluated
+  the documented fixture with `preview --json` (3 events, 2 proposed groups),
+  and compiled/ran a fresh Rust consumer using `RuleSet::parse` and
+  `preview_json`.
+- `npm audit --audit-level=high`: 0 vulnerabilities.
+
+The previous live response was reproduced before repair: the root, hashed JS,
+and hero image all returned `Cache-Control: public, must-revalidate,
+max-age=30`. After the repair commit is pushed, Azure Static Web Apps deploys
+the native configuration in `dist/site/`; rerun the live header commands below
+to confirm the CDN edge has completed rollout.
+
+```sh
+curl -sSI https://incident-fingerprint-preview.sociobot.in/assets/<hashed>.js
+curl -sSI https://incident-fingerprint-preview.sociobot.in/instrument-bench.webp
+```
+
+Both must include `cache-control: public, max-age=31536000, immutable`; the
+root and `sw.js` must retain a revalidation policy. The live response should
+also include the configured `content-security-policy` and
+`permissions-policy` headers.
+
+## What ships
+
+- Typed Rust library and `fingerprint-preview` CLI for locally evaluating the
+  documented five-part fingerprint DSL against scrubbed generic, Sentry,
+  Bugsnag, and Rollbar event exports.
+- Browser-local static evaluator with sample/file input, split/merge report,
+  JSON export, errors and empty states, Ctrl/Command+Enter, service-worker
+  offline shell, and no telemetry, uploads, accounts, cookies, or third-party
+  runtime assets.
+- Static landing/docs site in the existing mid-century instrument-panel visual
+  system. Asset provenance is retained in `.factory/assets/instrument-bench.json`.
+
+## Build, package, and deploy
 
 ```sh
 npm ci
@@ -49,55 +98,23 @@ npm test
 npm run build
 ```
 
-`npm run build` produces the static deployment at `dist/site/index.html` and
-the release CLI at `dist/bin/fingerprint-preview`.
-
-Verified on 2026-08-28:
-
-- `cargo fmt --check`: pass
-- `cargo clippy --all-targets --all-features -- -D warnings`: pass
-- `npm test`: pass (7 Rust unit tests, 2 CLI integration tests, 1 doctest,
-  5 browser evaluator unit tests, and 11 Playwright desktop/mobile checks; one
-  intentional non-mobile skip)
-- Playwright: Chromium desktop and 390×844 mobile; valid/error/empty flows,
-  keyboard run path, export availability, zero console errors, legal routes,
-  no horizontal overflow
-- axe-core WCAG 2 A/AA after evaluation: zero serious or critical violations
-- `npm audit --audit-level=high`: zero vulnerabilities
-- `cargo package --allow-dirty`: pass; 17 files, 83.0 KiB uncompressed / 23.4
-  KiB compressed
-- Static budgets: initial JS 11.1 KiB, CSS 17.0 KiB, hero WebP 47.4 KiB; no
-  runtime fonts, CDN scripts, or analytics. Entire initial transfer measured
-  by Lighthouse at 60 KiB.
-
-Production-build Lighthouse mobile simulation on local preview:
-
-| Category/metric | Result |
-| --- | ---: |
-| Performance | 100 |
-| Accessibility | 100 |
-| Best practices | 100 |
-| SEO | 100 |
-| First contentful paint | 0.9 s |
-| Largest contentful paint | 1.4 s |
-| Total blocking time | 0 ms |
-| Cumulative layout shift | 0 |
-
-Ready-to-publish Rust package command (factory credentials required for an
-actual publish):
+The CLI is at `dist/bin/fingerprint-preview`; the static Azure Static Web Apps
+artifact is `dist/site`. Do not publish from this repository. The factory can
+produce the ready-to-publish crate with:
 
 ```sh
 cargo package
 ```
 
-## Known gaps and next steps
+Deployment is static: publish `dist/site` with the included
+`staticwebapp.config.json` at its root. It is required for the cache and
+security policy; do not omit or relocate it.
 
-- Vendor adapters intentionally read the first exception/trace in common event
-  exports. Add adapter fixtures for other documented vendor variants as demand
-  appears; never present them as exact hosted grouping engines.
-- The tool can remove sensitive stack detail from its own report, but cannot
-  prove that arbitrary messages or filenames were scrubbed. The required
-  pre-import warning remains prominent.
-- Registry publishing and platform release binaries are factory release work;
-  no credentials or deployment infrastructure were touched here. Until the
-  crate is published, the site uses the honest `cargo install --git …` command.
+## Known gaps / next steps
+
+- Vendor adapters intentionally use common event-export shapes and do not
+  claim exact proprietary grouping semantics.
+- The evaluator removes known stack detail but cannot prove arbitrary messages
+  or filenames are safe; the pre-import scrub warning remains required.
+- Registry publishing and release binaries remain factory-owned. No registry
+  credentials were used during this repair.

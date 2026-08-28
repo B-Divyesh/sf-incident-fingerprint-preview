@@ -102,7 +102,11 @@ cargo package --allow-dirty
 ```
 
 The exact factory build command is `npm run build`; static deployment uses
-`dist/site`. CI is defined in `.github/workflows/ci.yml`.
+`dist/site`. The static host is Azure Static Web Apps; its response policy is
+versioned in `site/public/staticwebapp.config.json` and copied into that output
+directory by the Vite build. It keeps hashed JS/CSS and the immutable hero
+image for one year, while HTML and the service worker revalidate on every
+request. CI is defined in `.github/workflows/ci.yml`.
 
 ## Privacy and security
 

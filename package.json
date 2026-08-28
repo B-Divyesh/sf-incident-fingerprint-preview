@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config site/vite.config.js",
-    "test:site": "node --test site/src/evaluator.test.mjs",
-    "test": "cargo test && npm run test:site && npm run build:site && npm run test:e2e",
+    "test:site": "node --test site/src/evaluator.test.mjs site/src/deployment-config.test.mjs",
+    "test": "cargo test && npm run test:site && npm run build:site && npm run test:site-build && npm run test:e2e",
+    "test:site-build": "node --test site/src/build-output.test.mjs",
     "test:e2e": "playwright test",
     "build:site": "vite build --config site/vite.config.js",
     "build:cli": "cargo build --release && mkdir -p dist/bin && cp target/release/fingerprint-preview dist/bin/",
