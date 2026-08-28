@@ -44,6 +44,27 @@ test('fits a 390px viewport without horizontal overflow', async ({ page }, testI
   expect(widths.scroll).toBeLessThanOrEqual(widths.client);
 });
 
+test('mobile page links meet the 44px touch-target baseline', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile');
+  await page.goto('/');
+
+  const targets = [
+    ['header home', 'header .wordmark'],
+    ['source and DSL reference', '.cli-copy > a'],
+    ['footer home', 'footer .wordmark'],
+    ['Privacy', 'footer nav a:nth-child(1)'],
+    ['Terms', 'footer nav a:nth-child(2)'],
+    ['GitHub', 'footer nav a:nth-child(3)']
+  ];
+
+  for (const [name, selector] of targets) {
+    const box = await page.locator(selector).boundingBox();
+    expect(box, `${name} should be visible`).not.toBeNull();
+    expect(box.width, `${name} width`).toBeGreaterThanOrEqual(44);
+    expect(box.height, `${name} height`).toBeGreaterThanOrEqual(44);
+  }
+});
+
 for (const path of ['/privacy/', '/terms/']) {
   test(`${path} has a titled main document`, async ({ page }) => {
     await page.goto(path);

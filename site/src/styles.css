@@ -38,7 +38,7 @@ code, pre, kbd { font-family: var(--mono); }
 
 .site-header, footer { max-width: 1320px; margin: 0 auto; padding: 24px 48px; display: flex; align-items: center; gap: 40px; }
 .site-header { min-height: 92px; }
-.wordmark { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font: 15px/1.05 var(--mono); letter-spacing: -.04em; }
+.wordmark { min-height: 44px; display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font: 15px/1.05 var(--mono); letter-spacing: -.04em; }
 .wordmark b { font-weight: 800; }
 .mark { width: 37px; height: 37px; padding: 7px 6px; display: inline-flex; align-items: flex-end; gap: 3px; border-radius: 50%; background: var(--well); }
 .mark i { display: block; width: 6px; border-radius: 5px 5px 1px 1px; background: var(--amber); transform: rotate(9deg); }
@@ -159,7 +159,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .cli-copy > p:not(.eyebrow) { color: #39483f; }
 .cli-copy ul { margin: 24px 0; padding-left: 20px; }
 .cli-copy li { margin: 6px 0; }
-.cli-copy a { font: 800 13px/1.5 var(--mono); }
+.cli-copy a { min-height: 44px; display: inline-flex; align-items: center; font: 800 13px/1.5 var(--mono); }
 .terminal { border: 6px solid #384a42; border-radius: 5px; background: #12231e; color: #efe9d4; box-shadow: 12px 14px 0 rgba(23,35,31,.24); }
 .terminal-top { height: 42px; padding: 0 12px; display: flex; align-items: center; gap: 7px; background: #31463e; }
 .terminal-top span { width: 9px; height: 9px; border-radius: 50%; background: #d7a940; }
@@ -176,6 +176,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 footer { min-height: 150px; }
 footer > p { margin: 0 auto 0 0; color: #46534c; font-size: 14px; }
 footer nav { display: flex; gap: 24px; font: 700 12px/1 var(--mono); }
+footer nav a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
 
 .legal-page { min-height: 100vh; background: var(--panel); }
 .legal-header { border-bottom: 1px solid #a59f8e; }
