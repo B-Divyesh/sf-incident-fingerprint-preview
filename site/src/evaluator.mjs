@@ -154,10 +154,11 @@ function stringValue(value) {
 }
 
 function stableHash(parts) {
-  let hash = 2166136261;
-  for (const char of parts.join('\0')) {
-    hash ^= char.codePointAt(0);
-    hash = Math.imul(hash, 16777619);
+  let hash = 0xcbf29ce484222325n;
+  const bytes = new TextEncoder().encode(`${parts.join('\0')}\0`);
+  for (const byte of bytes) {
+    hash ^= BigInt(byte);
+    hash = BigInt.asUintN(64, hash * 0x100000001b3n);
   }
-  return (hash >>> 0).toString(16).padStart(8, '0');
+  return hash.toString(16).padStart(16, '0');
 }

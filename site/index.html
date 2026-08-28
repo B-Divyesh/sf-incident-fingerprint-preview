@@ -35,8 +35,8 @@
           <p class="lede">Run proposed fingerprints against scrubbed incident samples. See every split, merge, and representative frame without waiting for production traffic.</p>
           <div class="hero-actions">
             <a class="primary-button" href="#bench">Run the sample</a>
-            <button class="copy-install" type="button" data-copy="cargo install incident-fingerprint-preview">
-              <span aria-hidden="true">$</span> cargo install… <b>Copy</b>
+            <button class="copy-install" type="button" data-copy="cargo install --git https://github.com/B-Divyesh/sf-incident-fingerprint-preview">
+              <span aria-hidden="true">$</span> cargo install --git… <b>Copy</b>
             </button>
           </div>
           <ul class="assurances" aria-label="Product assurances">
@@ -152,7 +152,8 @@
         </div>
         <div class="terminal" id="install" aria-label="Command line usage example">
           <div class="terminal-top"><span></span><span></span><span></span><b>fingerprint-preview — local</b></div>
-          <pre><code><i>$</i> cargo install incident-fingerprint-preview
+          <pre><code><i>$</i> cargo install --git \
+    https://github.com/B-Divyesh/sf-incident-fingerprint-preview
 
 <i>$</i> fingerprint-preview preview \
     --events events.json \

@@ -29,3 +29,8 @@ test('does not emit source context or line numbers', () => {
   assert.equal(output.includes('secret'), false);
   assert.equal(output.includes('lineno'), false);
 });
+
+test('uses the CLI-compatible FNV-1a group identifier', () => {
+  const report = preview('[{"id":"e1","group_id":"g","message":"hello"}]', 'message');
+  assert.equal(report.groups[0].proposed_group, 'fp-a9bc8acca21f39b1');
+});

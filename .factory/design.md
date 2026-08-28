@@ -70,7 +70,8 @@ are effectively instant, and the signal lamp remains static.
   selectors and emerge as split/merged paper channels. It supports the hero's
   pre-deploy test-bench metaphor. Generation metadata is retained beside the
   source during production; the optimized WebP is shipped. License: project
-  asset under the repository MIT license.
+  asset under the repository MIT license. Machine-readable generation details
+  are retained at `.factory/assets/instrument-bench.json`.
 - Icons and signal marks are hand-made with CSS primitives; no icon library.
 
 Exact image prompt: “Wide editorial product illustration for a developer tool

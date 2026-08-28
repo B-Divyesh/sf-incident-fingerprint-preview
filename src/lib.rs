@@ -5,7 +5,6 @@
 
 use serde::Serialize;
 use serde_json::Value;
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
 use std::fmt::{self, Display};
@@ -498,12 +497,14 @@ fn frame_fingerprint(frames: &[FrameSummary], in_app_only: bool) -> Option<Strin
 }
 
 fn short_hash(parts: &[String]) -> String {
-    let mut hasher = Sha256::new();
+    let mut hash = 0xcbf29ce484222325_u64;
     for part in parts {
-        hasher.update(part.as_bytes());
-        hasher.update([0]);
+        for byte in part.as_bytes().iter().chain(std::iter::once(&0_u8)) {
+            hash ^= u64::from(*byte);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
     }
-    format!("{:x}", hasher.finalize())[..12].to_string()
+    format!("{hash:016x}")
 }
 
 fn first_string(value: &Value, paths: &[&[&str]]) -> Option<String> {
@@ -594,5 +595,10 @@ mod tests {
         let report = preview_json("[]", &RuleSet::parse("message").unwrap()).unwrap();
         assert_eq!(report.summary.event_count, 0);
         assert!(report.groups.is_empty());
+    }
+
+    #[test]
+    fn group_hash_is_stable_across_implementations() {
+        assert_eq!(short_hash(&["hello".to_string()]), "a9bc8acca21f39b1");
     }
 }
