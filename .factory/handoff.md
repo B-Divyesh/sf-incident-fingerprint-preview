@@ -62,24 +62,33 @@ Results:
   `preview_json`.
 - `npm audit --audit-level=high`: 0 vulnerabilities.
 - GitHub Actions installs the pinned Playwright Chromium binary before `npm
-  test`, so the clean-clone CI browser suite has the same dependency it uses
-  locally.
+  test`. The clean-clone workflow run for commit `2e34e9c` passed every step:
+  clean install, browser install, format check, `npm test`, and `cargo package`.
 
 The previous live response was reproduced before repair: the root, hashed JS,
 and hero image all returned `Cache-Control: public, must-revalidate,
-max-age=30`. After the repair commit is pushed, Azure Static Web Apps deploys
-the native configuration in `dist/site/`; rerun the live header commands below
-to confirm the CDN edge has completed rollout.
+max-age=30`. Production deployment completed on 2026-08-28 with the factory
+Azure identity and the work-order command shape:
 
 ```sh
-curl -sSI https://incident-fingerprint-preview.sociobot.in/assets/<hashed>.js
-curl -sSI https://incident-fingerprint-preview.sociobot.in/instrument-bench.webp
+npm ci && npm run build:site
+swa deploy dist/site --env production
 ```
 
-Both must include `cache-control: public, max-age=31536000, immutable`; the
-root and `sw.js` must retain a revalidation policy. The live response should
-also include the configured `content-security-policy` and
-`permissions-policy` headers.
+Live edge verification after deployment:
+
+| URL | Required/observed cache response |
+| --- | --- |
+| `/` | `public, must-revalidate, max-age=30` |
+| `/assets/index-BY6WMMA5.js` | `public, max-age=31536000, immutable` |
+| `/instrument-bench.webp` | `public, max-age=31536000, immutable` |
+| `/sw.js` | `public, max-age=0, must-revalidate` |
+
+The live root, JS, image, and service-worker responses now also include the
+configured same-origin `content-security-policy`, the restrictive
+`permissions-policy`, `x-frame-options: DENY`, `x-content-type-options:
+nosniff`, and the existing strict referrer policy. This closes both verifier
+findings on the live custom domain.
 
 ## What ships
 
