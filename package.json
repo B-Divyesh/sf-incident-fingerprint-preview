@@ -1,0 +1,20 @@
+{
+  "name": "incident-fingerprint-preview",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config site/vite.config.js",
+    "test:site": "node --test site/src/evaluator.test.mjs",
+    "test": "cargo test && npm run test:site && npm run build:site && npm run test:e2e",
+    "test:e2e": "playwright test",
+    "build:site": "vite build --config site/vite.config.js",
+    "build:cli": "cargo build --release && mkdir -p dist/bin && cp target/release/fingerprint-preview dist/bin/",
+    "build": "npm run build:site && npm run build:cli"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.58.2",
+    "vite": "7.3.6"
+  }
+}
