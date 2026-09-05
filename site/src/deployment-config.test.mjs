@@ -43,3 +43,8 @@ test('Azure Static Web Apps configuration restricts browser capabilities', async
   assert.match(headers['Permissions-Policy'], /camera=\(\)/);
   assert.match(headers['Permissions-Policy'], /microphone=\(\)/);
 });
+
+test('Azure Static Web Apps serves the product 404 without changing the deliberate status', async () => {
+  const config = await readConfig();
+  assert.deepEqual(config.responseOverrides?.['404'], { rewrite: '/404.html' });
+});

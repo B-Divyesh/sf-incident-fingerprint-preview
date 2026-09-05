@@ -3,8 +3,20 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#20312b">
     <meta name="description" content="Fingerprint Preview privacy policy: local processing, no accounts, cookies, analytics, or event uploads.">
+    <link rel="canonical" href="https://incident-fingerprint-preview.sociobot.in/privacy/">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Privacy — Fingerprint Preview">
+    <meta property="og:description" content="How the browser evaluator handles event data and public application files.">
+    <meta property="og:url" content="https://incident-fingerprint-preview.sociobot.in/privacy/">
+    <meta property="og:image" content="https://incident-fingerprint-preview.sociobot.in/social-preview.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Privacy — Fingerprint Preview">
+    <meta name="twitter:description" content="How the browser evaluator handles event data and public application files.">
+    <meta name="twitter:image" content="https://incident-fingerprint-preview.sociobot.in/social-preview.webp">
     <title>Privacy — Fingerprint Preview</title>
     <link rel="stylesheet" href="/src/styles.css">
   </head>
@@ -12,21 +24,32 @@
     <a class="skip-link" href="#main">Skip to main content</a>
     <header class="site-header legal-header">
       <a class="wordmark" href="/" aria-label="Fingerprint Preview home"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Fingerprint <b>Preview</b></span></a>
-      <a class="header-action" href="/">Return to test bench</a>
+      <nav aria-label="Main navigation"><a href="/demo/">Demo</a><a href="/#method">How it works</a><a href="/#cli">CLI</a><a href="/privacy/" aria-current="page">Privacy</a></nav>
+      <a class="header-action" href="/#install">Install v0.1.0</a>
     </header>
     <main class="legal-main" id="main">
-      <p class="eyebrow">Privacy / plain language</p>
-      <h1>Event data stays in your tab.</h1>
-      <p class="effective">Effective 28 August 2026</p>
-      <p>Fingerprint Preview has no account system, analytics, advertising, tracking pixels, cookies, or server-side event ingestion. The live evaluator processes pasted and selected files in your browser memory. It does not transmit or persist them.</p>
+      <p class="eyebrow">Privacy</p>
+      <h1>Privacy for the browser evaluator</h1>
+      <p class="effective">Effective 5 September 2026</p>
+      <p>Fingerprint Preview has no accounts, analytics, advertising, tracking pixels, cookies, or server-side event ingestion.</p>
+      <p>The evaluator processes pasted and selected files in browser memory. It does not transmit or save them.</p>
       <h2>What the site receives</h2>
-      <p>Normal hosting infrastructure may temporarily receive standard request metadata such as IP address, browser user agent, requested path, and time for security and delivery logs. The product does not add identifying telemetry or correlate those requests with evaluator content.</p>
+      <p>The host may receive your IP address, browser name, requested path, and request time.</p>
+      <p>These details support security and file delivery. The product does not connect them to evaluator content.</p>
       <h2>Local processing</h2>
-      <p>Event JSON, rules, and generated reports stay in the current browser tab. A service worker caches public application files for offline use; it does not cache your pasted content. Closing or reloading the tab discards the evaluator input.</p>
+      <p>Event JSON, rules, and reports stay in the current browser tab.</p>
+      <p>A service worker caches public application files for offline use. It does not cache pasted content.</p>
+      <p>Closing or reloading the tab discards your evaluator input.</p>
       <h2>Your responsibility</h2>
-      <p>Scrub event samples before importing them. The report intentionally omits source context, arguments, request data, and frame line numbers, but messages and filenames can still contain personal or secret data.</p>
+      <p>Scrub event samples before importing them.</p>
+      <p>Reports omit source context, arguments, request data, and frame line numbers. Messages and filenames can still contain sensitive data.</p>
       <h2>Questions</h2>
       <p>Open a privacy issue in the <a href="https://github.com/B-Divyesh/sf-incident-fingerprint-preview">public repository</a>. Do not attach sensitive event fixtures.</p>
     </main>
+    <footer>
+      <a class="wordmark" href="/" aria-label="Fingerprint Preview home"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Fingerprint <b>Preview</b></span></a>
+      <p>Preview fingerprint splits and merges before production.<br><span>Built by Param Factory · v0.1.0 · build 2026.09</span></p>
+      <nav aria-label="Footer navigation"><a href="/demo/">Demo</a><a href="/privacy/" aria-current="page">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-incident-fingerprint-preview">GitHub</a></nav>
+    </footer>
   </body>
 </html>

@@ -73,6 +73,15 @@ are effectively instant, and the signal lamp remains static.
   asset under the repository MIT license. Machine-readable generation details
   are retained at `.factory/assets/instrument-bench.json`.
 - Icons and signal marks are hand-made with CSS primitives; no icon library.
+- `site/public/social-preview.webp`: a 1200×630 center crop derived from the
+  original instrument illustration with ImageMagick. It introduces no new
+  source material and is used only for social previews.
+- `site/public/apple-touch-icon.png`: hand-composed from the product palette
+  and three-bar wordmark geometry with ImageMagick drawing primitives.
+- `site/public/cli-demo.cast`: a self-hosted asciinema v2 recording captured
+  from `fingerprint-preview demo` against the bundled fixture. The adjacent
+  HTML terminal is its readable text alternative. No third-party player or
+  asset is loaded.
 
 Exact image prompt: “Wide editorial product illustration for a developer tool
 landing page, a 1960s mid-century laboratory instrument panel used to compare

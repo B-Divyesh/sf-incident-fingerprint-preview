@@ -1,32 +1,47 @@
 # Fingerprint Preview
 
-An offline test bench for engineers changing error-grouping rules. Feed it
-scrubbed Sentry-style, Bugsnag-style, Rollbar-style, or generic JSON events;
-preview how a proposed fingerprint splits or merges the current groups; inspect
-representative frames; then export a machine-readable report before rollout.
+Preview fingerprint splits and merges before changing production rules.
+Fingerprint Preview is for engineers who tune incident grouping and want a
+local check before alert volume changes.
 
-Fingerprint Preview is deliberately not an incident tracker and does not claim
-to reproduce proprietary vendor grouping semantics. It never sends event data
-over the network.
+The package is free and open source under the MIT License. It includes one
+`fingerprint-preview` CLI binary, a small Rust library, and a browser
+evaluator. It is not an incident tracker and does not copy proprietary vendor
+grouping behavior.
+
+## Try the sample
+
+Run the installed CLI with its bundled three-event checkout sample:
+
+```sh
+fingerprint-preview demo
+```
+
+The command evaluates the sample, writes `events.json`, `rules.fp`, and
+`report.json` to a new temporary directory, and prints that directory. It does
+not read or change the current project.
+
+The browser demo is available at
+<https://incident-fingerprint-preview.sociobot.in/demo/>. It opens a populated
+split and merge report in one click. The demo stays labeled and can be reset.
+Starting for real returns to an empty workspace.
 
 ## Install
 
-Download a release binary, or build with a current Rust toolchain:
+Build with a current stable Rust toolchain:
 
 ```sh
-cargo install --path .
+cargo install --path . --locked
 fingerprint-preview --help
 ```
 
-The package starts at `0.1.0` and exposes both the `fingerprint-preview` binary
-and the small `incident_fingerprint_preview` Rust library.
+The package starts at version `0.1.0`.
 
-## Usage
+## Preview your events
 
-Create a redacted JSON array (or `{ "events": [...] }`). Existing group keys
-may be provided as `group_id`, `issue_id`, or `fingerprint`. Stack data can use
-generic `frames`, Sentry `exception.values[].stacktrace.frames`, Bugsnag
-`exceptions[].stacktrace`, or Rollbar `body.trace.frames` shapes.
+Create a scrubbed JSON array or an object containing an `events` array.
+Existing groups may use `group_id`, `issue_id`, or `fingerprint`. The importer
+reads generic frames and common Sentry, Bugsnag, and Rollbar event shapes.
 
 ```json
 [
@@ -36,14 +51,14 @@ generic `frames`, Sentry `exception.values[].stacktrace.frames`, Bugsnag
     "message": "card declined for customer [redacted]",
     "exception": { "type": "PaymentError", "value": "card declined" },
     "frames": [
-      { "function": "charge", "module": "checkout", "filename": "src/pay.rs", "lineno": 42, "in_app": true }
+      { "function": "charge", "module": "checkout", "filename": "src/pay.rs", "in_app": true }
     ]
   }
 ]
 ```
 
-Rules use one expression per line. Parts are joined with `+`; the first
-available branch separated by `??` wins. Comments begin with `#`.
+Rules use one expression per line. Join parts with `+`. Separate fallback
+branches with `??`. Comments begin with `#`.
 
 ```text
 exception.type + frames.in_app
@@ -51,23 +66,21 @@ exception.type + frames.in_app
 ```
 
 Supported parts are `message`, `exception.type`, `error.value`,
-`frames.in_app`, and `frames.all`. Frame parts use normalized
-`module/function/filename` values and never include line numbers, arguments, or
-source context in output.
+`frames.in_app`, and `frames.all`.
 
-Preview the change:
+Run a preview:
 
 ```sh
-fingerprint-preview preview --events fixtures/events.json --rules rules.fp
-fingerprint-preview preview --events fixtures/events.json --rules rules.fp --json > report.json
+fingerprint-preview preview --events fixtures/events.json --rules fixtures/rules.fp
+fingerprint-preview preview --events fixtures/events.json --rules fixtures/rules.fp --json > report.json
 ```
 
-The human report lists proposed groups, their baseline parents, the resulting
-split/merge/stable classification, and one representative frame. `--json`
-returns the typed `PreviewReport` format for CI. Exit codes are `0` for a valid
-preview, `2` for input/rule errors, and `1` for unexpected I/O errors.
+The human report shows baseline parents, split or merge states, and one
+representative frame. `--json` writes the versioned `PreviewReport` format for
+scripts. Exit codes are `0` for success, `2` for invalid input, and `1` for
+file or output errors.
 
-Library usage:
+## Use the Rust library
 
 ```rust
 use incident_fingerprint_preview::{preview_json, RuleSet};
@@ -79,41 +92,48 @@ let report = preview_json(events, &rules).unwrap();
 assert_eq!(report.summary.event_count, 1);
 ```
 
-## Web preview
+## Browser privacy and offline use
 
-The landing page includes a dependency-free live evaluator for pasting scrubbed
-fixtures. Processing stays in the browser tab; the site has no analytics,
-accounts, cookies, uploads, or third-party runtime assets.
+The browser evaluator sends no event content, telemetry, or analytics. It uses
+no accounts or cookies. Event JSON and rule edits stay in memory and disappear
+on reload. The service worker caches public application files, not pasted
+content. After the first visit, the demo reloads and evaluates offline.
+
+Scrub every sample before import. Reports omit frame line numbers, source
+context, arguments, and request data. Messages and filenames can still contain
+sensitive values.
+
+See the [privacy policy](https://incident-fingerprint-preview.sociobot.in/privacy/)
+and [terms](https://incident-fingerprint-preview.sociobot.in/terms/).
+
+## Develop, test, and package
+
+Requirements are a current stable Rust toolchain, Node.js 22, and npm.
+
+From a clean checkout:
 
 ```sh
-npm install
-npm run dev
-npm run build:site   # outputs dist/site/index.html
-```
-
-## Develop and verify
-
-```sh
-npm install
-npm test             # Rust + site unit tests + production build
-npm run build         # CLI release binary + site -> dist/
+npm ci
+npm test
+npm run build
+cargo fmt --check
+cargo clippy --all-targets --all-features -- -D warnings
 cargo test --doc
-cargo package --allow-dirty
+cargo package --locked
 ```
 
-The exact factory build command is `npm run build`; static deployment uses
-`dist/site`. The static host is Azure Static Web Apps; its response policy is
-versioned in `site/public/staticwebapp.config.json` and copied into that output
-directory by the Vite build. It keeps hashed JS/CSS and the immutable hero
-image for one year, while HTML and the service worker revalidate on every
-request. CI is defined in `.github/workflows/ci.yml`.
+`npm test` runs Rust tests, site tests, a production build, browser checks, and
+every claim in `.factory/claims.json`. `npm run build` creates the static site
+in `dist/site/` and the release CLI in `dist/bin/`.
 
-## Privacy and security
+For local browser work:
 
-Scrub before import. The evaluator omits source context, arguments, request
-data, and frame line numbers from fingerprints and reports, but it cannot prove
-that arbitrary messages or filenames are safe. Review fixtures before sharing
-or committing them. See the live privacy and terms pages for the web surface.
+```sh
+npm run dev
+```
+
+The factory deploys `dist/site/` to Azure Static Web Apps. Do not publish the
+crate from a worker checkout; the factory owns registry credentials.
 
 ## License
 

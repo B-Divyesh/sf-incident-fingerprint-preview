@@ -1,0 +1,135 @@
+[
+  {
+    "id": "demo-sandbox",
+    "claim": "The one-click demo opens a populated sample report, stays labeled, resets, and leaves the real workspace empty.",
+    "where": "landing primary action, demo banner, README",
+    "test": "npm run test:claims -- --grep \"@claim:demo-sandbox\"",
+    "sandbox": "fresh browser context; enter from home, inspect output, edit and reset, then start for real"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "The demo works offline after the first visit.",
+    "where": "landing facts, README",
+    "test": "npm run test:claims -- --grep \"@claim:offline-reload\"",
+    "sandbox": "dedicated fresh browser context; load demo, wait for service worker, go offline, reload and evaluate"
+  },
+  {
+    "id": "local-processing",
+    "claim": "The browser evaluator sends no event content, telemetry, or analytics.",
+    "where": "landing facts, evaluator, privacy page, README",
+    "test": "npm run test:claims -- --grep \"@claim:local-processing\"",
+    "sandbox": "fresh demo browser context; record every request while evaluating a unique marker"
+  },
+  {
+    "id": "no-accounts-cookies",
+    "claim": "The web product uses no accounts or cookies.",
+    "where": "privacy page, README",
+    "test": "npm run test:claims -- --grep \"@claim:no-accounts-cookies\"",
+    "sandbox": "fresh browser context; complete demo and real-workspace paths, then inspect cookies and identity requests"
+  },
+  {
+    "id": "input-not-saved",
+    "claim": "Reloading the real workspace discards event JSON and rule edits.",
+    "where": "privacy page, README",
+    "test": "npm run test:claims -- --grep \"@claim:input-not-saved\"",
+    "sandbox": "fresh browser context; enter unique event and rule values, evaluate, and reload"
+  },
+  {
+    "id": "public-cache-only",
+    "claim": "The service worker caches public application files but not pasted event content.",
+    "where": "privacy page, README",
+    "test": "npm run test:claims -- --grep \"@claim:public-cache-only\"",
+    "sandbox": "fresh demo context; paste a unique marker and inspect every Cache Storage request and response"
+  },
+  {
+    "id": "vendor-imports",
+    "claim": "The evaluator reads generic, Sentry, Bugsnag, and Rollbar event shapes.",
+    "where": "How it works, CLI section, README",
+    "test": "npm run test:claims -- --grep \"@claim:vendor-imports\"",
+    "sandbox": "browser demo; evaluate one realistic fixture for each documented shape and inspect its frame"
+  },
+  {
+    "id": "report-deltas",
+    "claim": "Reports show baseline and proposed group counts, split and merge states, group parents, and a representative frame.",
+    "where": "evaluator, CLI section, README",
+    "test": "npm run test:claims -- --grep \"@claim:report-deltas\"",
+    "sandbox": "browser demo with bundled three-event fixture"
+  },
+  {
+    "id": "report-redaction",
+    "claim": "Reports omit frame line numbers, source context, arguments, and request data.",
+    "where": "evaluator privacy note, privacy page, README",
+    "test": "npm run test:claims -- --grep \"@claim:report-redaction\"",
+    "sandbox": "browser demo with unique values in excluded fields; inspect downloaded report"
+  },
+  {
+    "id": "json-export",
+    "claim": "The browser exports a versioned JSON grouping report.",
+    "where": "evaluator, README",
+    "test": "npm run test:claims -- --grep \"@claim:json-export\"",
+    "sandbox": "browser demo; download and parse report, then verify schema and sample summary"
+  },
+  {
+    "id": "cli-output",
+    "claim": "The CLI provides human-readable and versioned JSON output.",
+    "where": "CLI section, README",
+    "test": "npm run test:claims -- --grep \"@claim:cli-output\"",
+    "sandbox": "built release CLI with shipped event and rule fixtures"
+  },
+  {
+    "id": "cli-exit-codes",
+    "claim": "The CLI exits 0 for success, 2 for invalid input, and 1 for file errors.",
+    "where": "CLI help, README",
+    "test": "npm run test:claims -- --grep \"@claim:cli-exit-codes\"",
+    "sandbox": "built release CLI with valid, malformed, unknown-rule, and missing-file inputs"
+  },
+  {
+    "id": "library-consumer",
+    "claim": "The documented Rust library example works in a fresh consumer project.",
+    "where": "README",
+    "test": "npm run test:claims -- --grep \"@claim:library-consumer\"",
+    "sandbox": "new temporary Cargo project depending on this package and running the documented API"
+  },
+  {
+    "id": "single-cli-binary",
+    "claim": "The package installs one CLI binary named fingerprint-preview.",
+    "where": "CLI section, README",
+    "test": "npm run test:claims -- --grep \"@claim:single-cli-binary\"",
+    "sandbox": "fresh temporary cargo install root; inspect and run installed artifacts"
+  },
+  {
+    "id": "terminal-recording",
+    "claim": "The landing-page recording shows the shipped sample CLI result.",
+    "where": "CLI recording",
+    "test": "npm run test:claims -- --grep \"@claim:terminal-recording\"",
+    "sandbox": "fetch self-hosted cast, run built CLI demo, normalize only its unique temporary path, and compare output"
+  },
+  {
+    "id": "cli-demo",
+    "claim": "The CLI demo uses bundled sample data, writes only to a new temporary directory, and names that directory.",
+    "where": "CLI help, README",
+    "test": "npm run test:claims -- --grep \"@claim:cli-demo\"",
+    "sandbox": "empty temporary working directory; run built CLI demo and inspect its generated report and working directory"
+  },
+  {
+    "id": "free-open-source",
+    "claim": "Fingerprint Preview is free and open source under the MIT License.",
+    "where": "landing facts, terms, README",
+    "test": "npm run test:claims -- --grep \"@claim:free-open-source\"",
+    "sandbox": "fresh demo flow; confirm no billing gate or billing request and verify the distributed license"
+  },
+  {
+    "id": "keyboard-run",
+    "claim": "Ctrl+Enter or Command+Enter evaluates the current browser input.",
+    "where": "evaluator shortcut label, README",
+    "test": "npm run test:claims -- --grep \"@claim:keyboard-run\"",
+    "sandbox": "fresh real workspace; enter one event and run with the platform keyboard shortcut"
+  },
+  {
+    "id": "file-size-recovery",
+    "claim": "The browser rejects event files larger than 5 MB and accepts a smaller file afterward.",
+    "where": "evaluator error message",
+    "test": "npm run test:claims -- --grep \"@claim:file-size-recovery\"",
+    "sandbox": "fresh browser context; choose 5,000,001-byte JSON then a valid small event file"
+  }
+]

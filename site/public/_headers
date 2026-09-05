@@ -11,6 +11,12 @@
 /instrument-bench.webp
   Cache-Control: public, max-age=31536000, immutable
 
+/social-preview.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/demo/*
+  Cache-Control: public, max-age=0, must-revalidate
+
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
 

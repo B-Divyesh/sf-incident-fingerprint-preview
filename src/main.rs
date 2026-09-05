@@ -1,9 +1,13 @@
 use clap::{Parser, Subcommand};
 use incident_fingerprint_preview::{
-    Adapter, GroupReport, PreviewReport, RuleSet, preview_json_with_adapter,
+    Adapter, GroupReport, PreviewReport, RuleSet, preview_json, preview_json_with_adapter,
 };
 use std::fs;
 use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+const DEMO_EVENTS: &str = include_str!("../fixtures/events.json");
+const DEMO_RULES: &str = include_str!("../fixtures/rules.fp");
 
 #[derive(Parser)]
 #[command(
@@ -20,6 +24,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Run the bundled three-event sample and write its files to a temporary directory.
+    Demo,
     /// Evaluate a fixture and print split/merge deltas.
     Preview {
         /// Path to a scrubbed JSON array or {"events": [...]} object.
@@ -51,6 +57,7 @@ fn main() {
 fn run() -> Result<(), (i32, String)> {
     let cli = Cli::parse();
     match cli.command {
+        Command::Demo => run_demo()?,
         Command::Preview {
             events,
             rules,
@@ -79,6 +86,43 @@ fn run() -> Result<(), (i32, String)> {
         }
     }
     Ok(())
+}
+
+fn run_demo() -> Result<(), (i32, String)> {
+    let rules = RuleSet::parse(DEMO_RULES).map_err(|error| (2, error.to_string()))?;
+    let report = preview_json(DEMO_EVENTS, &rules).map_err(|error| (2, error.to_string()))?;
+    let directory = demo_directory()?;
+    fs::write(directory.join("events.json"), DEMO_EVENTS)
+        .map_err(|error| (1, format!("could not write demo events: {error}")))?;
+    fs::write(directory.join("rules.fp"), DEMO_RULES)
+        .map_err(|error| (1, format!("could not write demo rule: {error}")))?;
+    let report_json = serde_json::to_string_pretty(&report)
+        .map_err(|error| (1, format!("could not encode demo report: {error}")))?;
+    fs::write(directory.join("report.json"), format!("{report_json}\n"))
+        .map_err(|error| (1, format!("could not write demo report: {error}")))?;
+
+    print_human(&report);
+    println!("\nDemo files  {}", directory.display());
+    println!("Nothing was read from or written to your project.");
+    Ok(())
+}
+
+fn demo_directory() -> Result<PathBuf, (i32, String)> {
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|error| (1, format!("could not create demo path: {error}")))?
+        .as_nanos();
+    let directory = std::env::temp_dir().join(format!(
+        "fingerprint-preview-demo-{}-{timestamp}",
+        std::process::id()
+    ));
+    fs::create_dir(&directory).map_err(|error| {
+        (
+            1,
+            format!("could not create {}: {error}", directory.display()),
+        )
+    })?;
+    Ok(directory)
 }
 
 fn print_human(report: &PreviewReport) {

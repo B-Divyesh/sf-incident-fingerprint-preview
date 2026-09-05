@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './site/tests',
+  testIgnore: 'claims.spec.js',
   timeout: 30_000,
   fullyParallel: true,
   forbidOnly: true,

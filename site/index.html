@@ -4,25 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#20312b">
-    <meta name="description" content="Preview how proposed incident fingerprint rules split or merge scrubbed events—locally, before production rollout.">
+    <meta name="description" content="Preview how fingerprint rules split or merge scrubbed incident samples before production rollout.">
+    <link rel="canonical" href="https://incident-fingerprint-preview.sociobot.in/">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <title>Fingerprint Preview — test incident grouping rules offline</title>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Fingerprint Preview — preview grouping changes">
+    <meta property="og:description" content="Test fingerprint rules against scrubbed incident samples before rollout.">
+    <meta property="og:url" content="https://incident-fingerprint-preview.sociobot.in/">
+    <meta property="og:image" content="https://incident-fingerprint-preview.sociobot.in/social-preview.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fingerprint Preview — preview grouping changes">
+    <meta name="twitter:description" content="Test fingerprint rules against scrubbed incident samples before rollout.">
+    <meta name="twitter:image" content="https://incident-fingerprint-preview.sociobot.in/social-preview.webp">
+    <title>Fingerprint Preview — preview grouping changes</title>
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <div class="offline-banner" id="offline-banner" role="status" hidden>
-      Offline mode — the evaluator still works; install links may not.
+      You are offline. The evaluator still works, but external links may not.
     </div>
+    <aside class="demo-banner" id="demo-banner" aria-label="Demo controls" hidden>
+      <strong>Demo — sample data, nothing is saved</strong>
+      <span>The report uses three bundled checkout events.</span>
+      <button type="button" id="reset-demo">Reset demo</button>
+      <a href="/">Start for real</a>
+    </aside>
     <header class="site-header">
       <a class="wordmark" href="/" aria-label="Fingerprint Preview home">
         <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>
         <span>Fingerprint<br><b>Preview</b></span>
       </a>
       <nav aria-label="Main navigation">
-        <a href="#bench">Test bench</a>
+        <a href="/demo/">Demo</a>
+        <a href="#method">How it works</a>
         <a href="#cli">CLI</a>
-        <a href="#method">Method</a>
+        <a href="/privacy/">Privacy</a>
       </nav>
       <a class="header-action" href="#install">Install v0.1.0</a>
     </header>
@@ -30,33 +50,31 @@
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-lamp" aria-hidden="true"></span> Local grouping laboratory</p>
-          <h1 id="hero-title">Know which alerts move<br>before the rule does.</h1>
-          <p class="lede">Run proposed fingerprints against scrubbed incident samples. See every split, merge, and representative frame without waiting for production traffic.</p>
+          <p class="eyebrow"><span class="status-lamp" aria-hidden="true"></span> Local incident-grouping preview</p>
+          <h1 id="hero-title">Preview fingerprint splits and merges before rollout</h1>
+          <p class="lede">For engineers tuning incident grouping rules before they change alert volume.</p>
           <div class="hero-actions">
-            <a class="primary-button" href="#bench">Run the sample</a>
-            <button class="copy-install" type="button" data-copy="cargo install --git https://github.com/B-Divyesh/sf-incident-fingerprint-preview">
-              <span aria-hidden="true">$</span> cargo install --git… <b>Copy</b>
-            </button>
+            <a class="primary-button" href="/demo/#bench">Try it with sample data</a>
+            <span class="action-note">Opens a populated split and merge report.</span>
           </div>
           <ul class="assurances" aria-label="Product assurances">
-            <li>Runs offline</li>
-            <li>No telemetry</li>
-            <li>Vendor-aware JSON</li>
+            <li>Free and open source</li>
+            <li>Works offline after your first visit</li>
+            <li>No telemetry or event uploads</li>
           </ul>
         </div>
         <figure class="hero-figure">
           <div class="calibration" aria-hidden="true"><span>INPUT</span><i></i><i></i><i></i><span>COMPARE</span><i></i><i></i><span>OUTPUT</span></div>
           <img src="/instrument-bench.webp" width="960" height="640" fetchpriority="high" alt="Illustrated cream laboratory console routing redacted stack traces into separate result channels">
-          <figcaption>Bench 01 · rule changes remain disconnected from production</figcaption>
+          <figcaption>Sample event paths before and after one proposed rule</figcaption>
         </figure>
       </section>
 
       <section class="bench-section" id="bench" aria-labelledby="bench-title">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Live instrument / browser-local</p>
-            <h2 id="bench-title">Grouping test bench</h2>
+            <p class="eyebrow">Browser evaluator</p>
+            <h2 id="bench-title">Test a fingerprint rule</h2>
           </div>
           <p>Paste a redacted fixture or load a local file. Nothing is uploaded, saved, or logged.</p>
         </div>
@@ -64,8 +82,8 @@
         <div class="instrument-shell">
           <div class="instrument-bar">
             <span><i class="status-lamp" aria-hidden="true"></i> <b id="machine-status">READY</b></span>
-            <span class="serial">FP–01 / LOCAL PROCESSOR</span>
-            <button type="button" id="load-sample">Restore sample</button>
+            <span class="serial">LOCAL PROCESSING</span>
+            <button type="button" id="load-sample">Try sample</button>
           </div>
 
           <div class="input-grid">
@@ -76,7 +94,7 @@
                 <label class="file-control" for="file-input">Load JSON</label>
               </div>
               <textarea id="events-input" spellcheck="false" aria-describedby="event-help event-error"></textarea>
-              <div class="input-meta"><span id="event-help">Array or <code>{ "events": [] }</code></span><span id="event-count">3 sample events</span></div>
+              <div class="input-meta"><span id="event-help">Array or <code>{ "events": [] }</code></span><span id="event-count">No events loaded</span></div>
               <p class="field-error" id="event-error" role="alert"></p>
             </div>
 
@@ -104,7 +122,7 @@
           <section class="result-module" aria-labelledby="result-title">
             <div class="result-header">
               <div>
-                <p class="eyebrow">03 / Comparative readout</p>
+                <p class="eyebrow">03 / Grouping report</p>
                 <h3 id="result-title">Proposed groups</h3>
               </div>
               <p id="result-announcer" class="sr-only" aria-live="polite"></p>
@@ -112,37 +130,37 @@
             <div id="results" aria-busy="false">
               <div class="empty-readout">
                 <span aria-hidden="true">↳</span>
-                <p><b>Ready for a bench test.</b> Evaluate the loaded sample to expose splits and merges.</p>
+                <p><b>No report yet.</b> Load scrubbed events, then evaluate the rule.</p>
               </div>
             </div>
           </section>
         </div>
-        <p class="privacy-note"><b>Scrub first.</b> Reports exclude line numbers, source context, arguments, and request data—but messages and filenames may still contain sensitive values.</p>
+        <p class="privacy-note"><b>Scrub first.</b> Reports exclude line numbers, source context, arguments, and request data. Messages and filenames may still contain sensitive values.</p>
       </section>
 
       <section class="method-section" id="method" aria-labelledby="method-title">
         <div class="section-heading narrow">
           <div>
-            <p class="eyebrow">Calibrated workflow</p>
-            <h2 id="method-title">Change rules with evidence</h2>
+          <p class="eyebrow">Three steps</p>
+          <h2 id="method-title">How it works</h2>
           </div>
         </div>
         <ol class="method-list">
           <li><span>1</span><div><h3>Scrub a fixture</h3><p>Export a representative event set, remove customer data, and retain existing group IDs.</p></div></li>
-          <li><span>2</span><div><h3>Dial the fingerprint</h3><p>Compose stable exception and frame fields with an explicit fallback.</p></div></li>
-          <li><span>3</span><div><h3>Inspect the delta</h3><p>Review each baseline split and cross-group merge before committing the rule.</p></div></li>
+          <li><span>2</span><div><h3>Write the fingerprint</h3><p>Combine stable exception and frame fields with an explicit fallback.</p></div></li>
+          <li><span>3</span><div><h3>Review the changes</h3><p>Check each baseline split and cross-group merge before rollout.</p></div></li>
         </ol>
         <aside class="honesty-note">
-          <b>Honest adapter boundary</b>
-          <p>Sentry, Bugsnag, and Rollbar JSON shapes are recognized. Fingerprint Preview models your rule—it does not claim exact proprietary grouping semantics.</p>
+          <b>What it does not do</b>
+          <p>It reads common Sentry, Bugsnag, and Rollbar JSON shapes. It does not copy any vendor’s private grouping logic.</p>
         </aside>
       </section>
 
       <section class="cli-section" id="cli" aria-labelledby="cli-title">
         <div class="cli-copy">
-          <p class="eyebrow">The production artifact</p>
-          <h2 id="cli-title">Put the preview in review.</h2>
-          <p>The same evaluator is a typed Rust library and a single CLI binary. Commit scrubbed fixtures, export versioned JSON, and make a grouping report part of every rule change.</p>
+          <p class="eyebrow">Install locally</p>
+          <h2 id="cli-title">Use the CLI or Rust library</h2>
+          <p>The package provides one CLI binary and a typed Rust library. Add scrubbed fixtures and versioned reports to rule reviews.</p>
           <ul>
             <li>Helpful exit codes for CI</li>
             <li>Human and <code>--json</code> output</li>
@@ -150,30 +168,32 @@
           </ul>
           <a href="https://github.com/B-Divyesh/sf-incident-fingerprint-preview" rel="noreferrer">Read the source and full DSL reference <span aria-hidden="true">→</span></a>
         </div>
-        <div class="terminal" id="install" aria-label="Command line usage example">
-          <div class="terminal-top"><span></span><span></span><span></span><b>fingerprint-preview — local</b></div>
-          <pre><code><i>$</i> cargo install --git \
+        <figure class="terminal" id="install" aria-labelledby="recording-title">
+          <div class="terminal-top"><span></span><span></span><span></span><b id="recording-title">Recorded CLI sample · v0.1.0</b></div>
+          <pre id="recording-screen"><code><i>$</i> cargo install --git \
     https://github.com/B-Divyesh/sf-incident-fingerprint-preview
 
-<i>$</i> fingerprint-preview preview \
-    --events events.json \
-    --rules grouping.fp
+<i>$</i> fingerprint-preview demo
 
 FINGERPRINT PREVIEW
-Groups  2 baseline → 2 proposed (+0)
-Delta   1 split / 1 merged / 0 stable
+ Groups  2 baseline -&gt; 2 proposed (+0)
+ Delta   1 split baseline / 1 merged proposed / 0 stable proposed
 
-<em>[split]</em> fp-a859…  1 event
-<strong>[merge]</strong> fp-9b20…  2 events</code></pre>
-          <button type="button" data-copy="fingerprint-preview preview --events events.json --rules grouping.fp">Copy command</button>
-        </div>
+<em>[split]</em> fp-3d51aa98b7ae657a  1 event(s)
+<strong>[split+merge]</strong> fp-6349d8c38aedce2f  2 event(s)</code></pre>
+          <div class="terminal-actions">
+            <button type="button" id="replay-recording">Replay recording</button>
+            <button type="button" data-copy="fingerprint-preview demo">Copy demo command</button>
+          </div>
+          <figcaption>The recording uses the same bundled fixture as the browser demo.</figcaption>
+        </figure>
       </section>
     </main>
 
     <footer>
       <a class="wordmark" href="/" aria-label="Fingerprint Preview home"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Fingerprint <b>Preview</b></span></a>
-      <p>Open source tooling for quieter, more accurate incident response.</p>
-      <nav aria-label="Legal navigation"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-incident-fingerprint-preview">GitHub</a></nav>
+      <p>Preview fingerprint splits and merges before production.<br><span>Built by Param Factory · v0.1.0 · build 2026.09</span></p>
+      <nav aria-label="Footer navigation"><a href="/demo/">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-incident-fingerprint-preview">GitHub</a></nav>
     </footer>
   </body>
 </html>

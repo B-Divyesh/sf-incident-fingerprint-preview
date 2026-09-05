@@ -13,10 +13,21 @@ const eventError = document.querySelector<HTMLElement>('#event-error')!;
 const ruleError = document.querySelector<HTMLElement>('#rule-error')!;
 const eventCount = document.querySelector<HTMLElement>('#event-count')!;
 const fileInput = document.querySelector<HTMLInputElement>('#file-input')!;
+const sampleButton = document.querySelector<HTMLButtonElement>('#load-sample')!;
+const demoBanner = document.querySelector<HTMLElement>('#demo-banner')!;
+const resetDemoButton = document.querySelector<HTMLButtonElement>('#reset-demo')!;
+const isDemo = window.location.pathname.replace(/\/+$/, '') === '/demo'
+  || new URLSearchParams(window.location.search).get('demo') === '1';
 let latestReport: ReturnType<typeof preview> | null = null;
 
-eventsInput.value = SAMPLE_EVENTS;
+eventsInput.value = isDemo ? SAMPLE_EVENTS : '';
 rulesInput.value = SAMPLE_RULE;
+if (isDemo) {
+  document.title = 'Demo — Fingerprint Preview';
+  document.querySelector<HTMLLinkElement>('link[rel="canonical"]')!.href = 'https://incident-fingerprint-preview.sociobot.in/demo/';
+  demoBanner.hidden = false;
+  sampleButton.textContent = 'Reset sample';
+}
 
 function markEdited() {
   machineStatus.textContent = 'EDITED';
@@ -119,13 +130,21 @@ fileInput.addEventListener('change', async () => {
   fileInput.value = '';
 });
 
-document.querySelector('#load-sample')!.addEventListener('click', () => {
-  if (eventsInput.value !== SAMPLE_EVENTS && !window.confirm('Replace the current event fixture with the three-event sample?')) return;
+function resetDemo() {
   eventsInput.value = SAMPLE_EVENTS;
   rulesInput.value = SAMPLE_RULE;
   markEdited();
-  eventsInput.focus();
+  run();
+}
+
+sampleButton.addEventListener('click', () => {
+  if (!isDemo) {
+    window.location.assign('/demo/#bench');
+    return;
+  }
+  resetDemo();
 });
+resetDemoButton.addEventListener('click', resetDemo);
 
 exportButton.addEventListener('click', () => {
   if (!latestReport) return;
@@ -152,8 +171,43 @@ for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')
   });
 }
 
+const recordingScreen = document.querySelector<HTMLElement>('#recording-screen')!;
+const replayButton = document.querySelector<HTMLButtonElement>('#replay-recording')!;
+const recordingFallback = recordingScreen.textContent || '';
+let recordingRun = 0;
+replayButton.addEventListener('click', async () => {
+  const thisRun = ++recordingRun;
+  replayButton.disabled = true;
+  replayButton.textContent = 'Playing recording…';
+  try {
+    const response = await fetch('/cli-demo.cast');
+    if (!response.ok) throw new Error('Recording could not be loaded.');
+    const events = (await response.text()).trim().split('\n').slice(1).map((line) => JSON.parse(line));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    recordingScreen.textContent = '';
+    let previousTime = 0;
+    for (const [time, type, output] of events) {
+      if (thisRun !== recordingRun || type !== 'o') continue;
+      if (!reduceMotion) {
+        const delay = Math.min(350, Math.max(0, (time - previousTime) * 1000));
+        await new Promise((resolve) => window.setTimeout(resolve, delay));
+      }
+      recordingScreen.textContent += output.replace(/\r/g, '');
+      recordingScreen.scrollTop = recordingScreen.scrollHeight;
+      previousTime = time;
+    }
+  } catch {
+    recordingScreen.textContent = recordingFallback;
+  } finally {
+    replayButton.disabled = false;
+    replayButton.textContent = 'Replay recording';
+  }
+});
+
 const offlineBanner = document.querySelector<HTMLElement>('#offline-banner')!;
-function updateOnlineState() { offlineBanner.hidden = navigator.onLine; }
+function updateOnlineState() {
+  offlineBanner.hidden = navigator.onLine && document.body.dataset.offlineFallback !== 'true';
+}
 window.addEventListener('online', updateOnlineState);
 window.addEventListener('offline', updateOnlineState);
 updateOnlineState();
@@ -161,3 +215,5 @@ updateOnlineState();
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 }
+
+if (isDemo) run();

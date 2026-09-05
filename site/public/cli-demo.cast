@@ -1,0 +1,7 @@
+{"version":2,"width":104,"height":28,"timestamp":1788627600,"env":{"SHELL":"/bin/sh","TERM":"xterm-256color"},"title":"Fingerprint Preview bundled demo"}
+[0.15,"o","$ fingerprint-preview demo\r\n"]
+[0.42,"o","FINGERPRINT PREVIEW\r\nRule    exception.type + frames.in_app ?? message\r\n"]
+[0.68,"o","Groups  2 baseline -> 2 proposed (+0)\r\nDelta   1 split baseline / 1 merged proposed / 0 stable proposed\r\n\r\n"]
+[0.91,"o","[split] fp-3d51aa98b7ae657a  1 event(s)\r\n  from         checkout-errors\r\n  fingerprint  ValidationError + cart/total/src/cart.rs\r\n  events       evt-102\r\n  frame        cart/total/src/cart.rs [in-app]\r\n\r\n"]
+[1.18,"o","[split+merge] fp-6349d8c38aedce2f  2 event(s)\r\n  from         checkout-errors, payment-retries\r\n  fingerprint  PaymentError + checkout/charge/src/pay.rs\r\n  events       evt-101, evt-103\r\n  frame        checkout/charge/src/pay.rs [in-app]\r\n\r\n"]
+[1.4,"o","Demo files  /tmp/fingerprint-preview-demo-1788-1788651735878296135\r\nNothing was read from or written to your project.\r\n"]
