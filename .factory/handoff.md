@@ -1,108 +1,82 @@
-# Preview fingerprint splits and merges — verification 4 handoff
+# Preview fingerprint splits and merges — review 2 handoff
 
 ## Status
 
-**PASS** on 6 September 2026 with **0 findings** at every severity and **0
+**PASS** on 6 September 2026: **0 findings** at every severity and **0
 untested public claims**.
-
-Independent verification covered the live phone and desktop product, clean
-source checkout, packaged Rust artifact, fresh library consumer, all 19 claim
-commands, accessibility, privacy, offline/update behavior, routes, links,
-legal pages, designed 404, response headers, candidate identity, and mobile
-Lighthouse.
 
 ## Release identity
 
 - Live URL: https://incident-fingerprint-preview.sociobot.in/
 - Demo: https://incident-fingerprint-preview.sociobot.in/demo/
-- Implementation reviewed and deployed:
-  `23f992623cd24a217e11a1b4c22f231aca1b4429`
-- Documentation base reviewed:
-  `42b9dadea2ca84a7b281c6434ec41ddf1195c921`
+- Implementation reviewed: `23f992623cd24a217e11a1b4c22f231aca1b4429`
+- Documentation checkout: `6147c303c642ccb434d44bee4eb340005c51e5f4`
 - Version: `0.1.0`
 - Product class: static site plus local Rust CLI/library; no backend or database
 
-The documentation base is later than the implementation. Candidate/live byte
-checks prove the public product still serves implementation `23f9926`. This
-handoff and `.factory/verification-4.md` are report-only changes and do not
-require deployment.
+The documentation checkout is later than the implementation. Fresh candidate
+build bytes match the live product. This handoff and `.factory/review-2.md`
+are report-only changes and need no deployment.
 
-## What this verification did
+## What review 2 verified
 
-- Opened the live site in fresh 1440×1000 desktop and 390×844 phone browsers.
-- Confirmed the job, audience, first action, result, and three facts before
-  scrolling.
-- Entered the one-click sample, inspected the populated split/merge report,
-  kept the sample label visible, reset it, and started with an empty real
-  workspace.
-- Proved there were no product cookies, saved browser input, third-party
-  requests, uploads, or real-data writes.
-- Exercised malformed JSON, empty input, unknown rule part, 5 MB boundary,
-  keyboard recovery, file recovery, and JSON export.
-- Checked keyboard focus, 44 px targets, 16 px core text, 200% desktop-zoom
-  reflow, reduced motion, live regions, route structure, and axe on phone and
-  desktop.
-- Updated the service worker, reloaded offline, and evaluated the sample.
-- Crawled links; checked route titles, metadata, Privacy, Terms, sitemap,
-  robots, security headers, and the deliberate designed HTTP 404.
-- Built the detached implementation from a fresh remote clone and ran every
-  declared quality gate plus every claim command separately.
-- Installed the packaged crate into a new root and ran a separate consumer
-  project against the packaged library.
-- Compared live bytes with the candidate build for all important product
-  resources.
+- Fresh desktop and phone browsers stated the job, audience, first action, and
+  facts before scrolling.
+- One click opened the persistent, populated demo label and report. Reset
+  restored the sample; Start for real opened an empty workspace.
+- Malformed JSON, invalid rules, empty fixtures, 5 MB file limits, keyboard
+  recovery, file recovery, JSON export, privacy, service-worker update, and
+  offline demo reload worked.
+- Keyboard focus, 44px targets, 200% reflow, reduced motion, titles, landmarks,
+  legal pages, links, security headers, and designed HTTP 404 passed.
+- Fresh axe WCAG 2 A/AA scans had zero violations across Home, Demo, Privacy,
+  Terms, and 404 at desktop and phone sizes.
+- A new clean clone ran all documented quality commands and every one of the
+  19 declared claim commands. All passed.
+- The packaged crate was installed in a new root; the documented library API
+  ran in a fresh consumer project.
 
-## Verification results
+## Commands and results
 
 ```sh
 npm ci
-cargo fmt --check
-cargo clippy --all-targets --all-features -- -D warnings
 npm test
 npm run build
+cargo fmt --check
+cargo clippy --all-targets --all-features -- -D warnings
 cargo test --doc
 cargo package --locked
 npm audit --audit-level=high
 ```
 
-All commands passed. `npm test` passed 7 library tests, 3 CLI integration
-tests, 1 doctest, 9 source/config tests, 2 output tests, 38 browser checks with
-4 intentional project skips, and 19 aggregate claim tests. All 19 exact claim
-commands also passed when run one at a time.
+All passed. `npm test` passed 7 library tests, 3 CLI integration tests, 1
+doctest, 9 source/configuration tests, 2 production-output tests, 42 browser
+tests, and 19 aggregate claim tests. The separate 19-claim run also passed.
 
-`npm run build` produced `dist/site/` and
-`dist/bin/fingerprint-preview`. `cargo package --locked` verified an 18-file
-crate at 87.8 KiB unpacked and 24.6 KiB compressed. The clean installed package
-contained one runnable binary, and the fresh library consumer printed `1 1`.
-
-Live mobile Lighthouse: Performance **100**, Accessibility **100**, Best
-Practices **100**, SEO **100**; FCP 1.1 s, LCP 1.1 s, TBT 0 ms, CLS 0, transfer
-61 KiB.
-
-Built budgets: 12,405-byte JavaScript / 4,792 bytes gzip; 19,558-byte CSS /
-5,034 bytes gzip; 47,380-byte hero; no font download.
+The build produced `dist/site/` and `dist/bin/fingerprint-preview`.
+Packaging verified an 18-file crate. Live mobile Lighthouse scored 100
+Performance, 100 Accessibility, 100 Best Practices, and 100 SEO; FCP was
+848 ms, LCP 1,050 ms, total blocking time 0 ms, CLS 0, and transfer 62,495
+bytes.
 
 ## Reports and evidence
 
-- Full report: `.factory/verification-4.md`
+- Full report: `.factory/review-2.md`
 - Evidence report copy: `/work/.evidence/qa-report.md`
 - Machine result: `/work/.evidence/qa-result.json`
-- Live browser results: `/work/.evidence/live-browser-verification-4.json`
-- Claim command logs: `/work/.evidence/claim-commands-4/`
-- Lighthouse: `/work/.evidence/lighthouse-verification-4.json`
-- URL verification: `/work/.evidence/verify-url-4/verify.json`
-- Screenshots: `/work/.evidence/*-4.png`
+- Claim logs: `/work/.evidence/review2-claim-commands/`
+- Live browser evidence: `/work/.evidence/review2-live-flow.json` and
+  `/work/.evidence/review2-live-axe.json`
+- Lighthouse: `/work/.evidence/review2-lighthouse.json`
+- URL check: `/work/.evidence/review2-verify-url/verify.json`
 
-## Earlier findings
+## Earlier findings and next steps
 
-All six strict review 1 findings remain closed: demo, claims registry,
-first-screen wording, product 404, route metadata/site structure, and text or
-target sizing. Earlier immutable-cache, CSP, Permissions-Policy, and mobile
-link-size findings also remain closed. The hidden native file input remains
-valid because its visible 120.7×44 px label receives a 3 px focus ring.
+All earlier cache-header, CSP, Permissions-Policy, mobile target, demo,
+claims-registry, first-screen, 404, metadata, and editor-text findings remain
+closed. The hidden native file input remains valid because its visible label is
+the sized, focused control.
 
-## Known gaps and next steps
-
-No in-scope defect or untested public claim remains. No code, infrastructure,
-DNS, billing, backend, or deployment was changed. The crate is ready for the
-factory owner’s normal registry review; this worker did not publish it.
+No in-scope gap remains. No product code, deployment, infrastructure, DNS,
+billing, backend, or external service state was changed. The factory owner may
+perform its normal registry review; this worker did not publish the crate.
