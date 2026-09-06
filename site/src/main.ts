@@ -27,6 +27,7 @@ if (isDemo) {
   document.querySelector<HTMLLinkElement>('link[rel="canonical"]')!.href = 'https://incident-fingerprint-preview.sociobot.in/demo/';
   demoBanner.hidden = false;
   sampleButton.textContent = 'Reset sample';
+  eventCount.textContent = '3 sample events';
 }
 
 function markEdited() {

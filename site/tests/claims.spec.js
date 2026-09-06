@@ -33,6 +33,7 @@ test('@claim:demo-sandbox one click opens and resets an isolated populated demo'
   await expect(page).toHaveURL(/\/demo\/#bench$/);
   await expect(page).toHaveTitle('Demo — Fingerprint Preview');
   await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+  await expect(page.locator('#event-count')).toHaveText('3 sample events');
   await expect(page.locator('#machine-status')).toHaveText('COMPLETE');
   await expect(page.getByText('split + merge', { exact: true })).toBeVisible();
 
